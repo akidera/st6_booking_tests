@@ -1,0 +1,1 @@
+# st6_booking_tests
