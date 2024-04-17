@@ -38,7 +38,7 @@ class TestAll(BaseTest):
     @allure.feature('GET booking')
     @allure.story('Get booking by id')
     @pytest.mark.usefixtures("get_booking_by_id")
-    def test_get_booking_by_id(self, create_booking_obj, del_booking, create_del_booking):
+    def test_get_booking_by_id(self, create_booking_obj, del_booking):
         booking_id = create_booking_obj.bookingid
         price_post = create_booking_obj.booking.totalprice
         first_name = create_booking_obj.booking.firstname
@@ -54,7 +54,6 @@ class TestAll(BaseTest):
     @allure.suite('CRUD with bookings')
     @allure.feature('UPDATE booking')
     @allure.story('Update booking FULL')
-    @pytest.mark.usefixtures("create_booking", "get_auth_token", "update_booking_full")
     @pytest.mark.parametrize("firstname, totalprice, checkin",
                              [("Bill", 45, "2019-01-02"),
                               ("Mark", 88, "2019-01-05"),
