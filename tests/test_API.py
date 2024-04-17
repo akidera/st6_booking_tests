@@ -8,17 +8,7 @@ class TestAll(BaseTest):
     @allure.feature('Create booking')
     @allure.suite('CRUD with bookings')
     @pytest.mark.critical
-    def test_create_booking(self):
-        self.create_endpnt.create_booking()
-        self.create_endpnt.check_resp_code_is_200()
-        self.create_endpnt.check_response_schema()
-        self.get_auth_endpnt.get_auth_token()
-        self.delete_enpnt.delete_booking(booking_id=self.create_endpnt.booking_id, token=self.get_auth_endpnt.token)
-
-    @allure.suite('CRUD with bookings')
-    @allure.feature('GET booking')
-    @allure.story('Get booking by id')
-    def test_get_booking_by_id(self):
+    def test_create_booking(self, auth_token):
         self.create_endpnt.create_booking()
         first_name_post = self.create_endpnt.first_name
         price_post = self.create_endpnt.total_price
@@ -33,6 +23,18 @@ class TestAll(BaseTest):
         self.get_auth_endpnt.get_auth_token()
 
         self.delete_enpnt.delete_booking(booking_id=self.create_endpnt.booking_id, token=self.get_auth_endpnt.token)
+
+    @allure.suite('CRUD with bookings')
+    @allure.feature('GET booking')
+    @allure.story('Get booking by id')
+    def test_get_booking_by_id(self, create_del_booking):
+        booking_id, price_post, first_name = create_del_booking
+
+        self.get_by_id_endpnt.get_booking_by_id(booking_id=booking_id)
+
+        self.get_by_id_endpnt.check_resp_code_is_200()
+        self.get_by_id_endpnt.check_total_price_is_(price_post)
+        self.get_by_id_endpnt.check_first_name_is_(first_name)
 
     @allure.suite('CRUD with bookings')
     @allure.feature('UPDATE booking')
@@ -59,7 +61,8 @@ class TestAll(BaseTest):
 
         self.get_auth_endpnt.get_auth_token()
 
-        self.update_all_endpnt.update_booking_full(booking_id=booking_id, token=self.get_auth_endpnt.token, body=upd_body)
+        self.update_all_endpnt.update_booking_full(booking_id=booking_id, token=self.get_auth_endpnt.token,
+                                                   body=upd_body)
 
         self.update_all_endpnt.check_resp_code_is_200()
         self.update_all_endpnt.check_first_name_is_(firstname)
@@ -67,6 +70,7 @@ class TestAll(BaseTest):
         self.update_all_endpnt.check_booking_dates_checkin(checkin)
 
         self.delete_enpnt.delete_booking(booking_id=booking_id, token=self.get_auth_endpnt.token)
+
 
     @allure.suite('CRUD with bookings')
     @allure.feature('UPDATE booking')
