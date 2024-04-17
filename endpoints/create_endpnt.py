@@ -5,6 +5,7 @@ from endpoints.BaseEndpoint import BaseEndpoint
 
 
 class CreateBooking(BaseEndpoint):
+    data = None
 
     @allure.step('Send create request')
     def create_booking(self, body=None, base_url=BaseEndpoint.BASE_URL):
@@ -12,6 +13,7 @@ class CreateBooking(BaseEndpoint):
         self.response = requests.post(f"{base_url}/booking", json=body)
         self.response_code = self.response.status_code
         self.response_json = self.response.json()
+        self.data = BookingResponse(**self.response_json)
         self.booking_id = self.response_json['bookingid']
         self.first_name = self.response_json['booking']['firstname']
         self.last_name = self.response_json['booking']['lastname']

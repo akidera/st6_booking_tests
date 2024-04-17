@@ -7,6 +7,7 @@ from endpoints.get_auth_token import GetAuthToken
 from endpoints.delete_endpoint import DeleteBooking
 from endpoints.update_endpoint import UpdateBookingFull
 from endpoints.update_part_endpoint import UpdateBookingPart
+from endpoints.json_schemas import BookingResponse
 
 base_url = BaseEndpoint.BASE_URL
 
@@ -19,7 +20,12 @@ def start_end():
 
 
 @pytest.fixture()
-def create_del_booking():
+def get_auth_token():
+    return GetAuthToken()
+
+
+@pytest.fixture()
+def create_booking_obj():
     body = {
         "firstname": "Jim",
         "lastname": "Brown",
@@ -32,26 +38,36 @@ def create_del_booking():
         "additionalneeds": "Breakfast"
     }
     response = requests.post(f"{base_url}/booking", json=body).json()
-    booking_id = response['bookingid']
-    price_post = response['booking']['totalprice']
-    first_name = response['booking']['firstname']
+    data = BookingResponse(**response)
+    return data
 
-    yield booking_id, price_post, first_name
 
+@pytest.fixture()
+def auth():
     auth_body = {
         "username": "admin",
         "password": "password123"
     }
     response = requests.post(f"{base_url}/auth", json=auth_body).json()
-    auth_token = response['token']
-
-    headers = {'Cookie': f'token={auth_token}'}
-    requests.delete(f"{base_url}/booking/{booking_id}", headers=headers)
+    token = response['token']
+    return token
 
 
 @pytest.fixture()
-def get_auth_token():
-    return GetAuthToken()
+def del_booking():
+    bookings_ids = []
+    yield bookings_ids
+    auth_body = {
+        "username": "admin",
+        "password": "password123"
+    }
+    response = requests.post(f"{base_url}/auth", json=auth_body).json()
+    token = response['token']
+    headers = {'Cookie': f'token={token}'}
+
+    for id in bookings_ids:
+        requests.delete(f"{base_url}/booking/{id}", headers=headers)
+        print(f'\n{id} was deleted')
 
 
 @pytest.fixture()
