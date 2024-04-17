@@ -8,7 +8,6 @@ class TestAll(BaseTest):
     @allure.feature('Create booking')
     @allure.suite('CRUD with bookings')
     @pytest.mark.critical
-    @pytest.mark.usefixtures("del_booking", "get_booking_by_id", "get_auth_token")
     def test_create_booking(self, del_booking):
         body = {
             "firstname": "Anna",
