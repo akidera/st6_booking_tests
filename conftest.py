@@ -13,64 +13,6 @@ base_url = BaseEndpoint.BASE_URL
 
 
 @pytest.fixture()
-def start_end():
-    print('\nStart testing')
-    yield
-    print('\nEnd testing')
-
-
-@pytest.fixture()
-def get_auth_token():
-    return GetAuthToken()
-
-
-@pytest.fixture()
-def create_booking_obj():
-    body = {
-        "firstname": "Jim",
-        "lastname": "Brown",
-        "totalprice": 111,
-        "depositpaid": True,
-        "bookingdates": {
-            "checkin": "2018-01-01",
-            "checkout": "2019-01-01"
-        },
-        "additionalneeds": "Breakfast"
-    }
-    response = requests.post(f"{base_url}/booking", json=body).json()
-    data = BookingResponse(**response)
-    return data
-
-
-@pytest.fixture()
-def auth():
-    auth_body = {
-        "username": "admin",
-        "password": "password123"
-    }
-    response = requests.post(f"{base_url}/auth", json=auth_body).json()
-    token = response['token']
-    return token
-
-
-@pytest.fixture()
-def del_booking():
-    bookings_ids = []
-    yield bookings_ids
-    auth_body = {
-        "username": "admin",
-        "password": "password123"
-    }
-    response = requests.post(f"{base_url}/auth", json=auth_body).json()
-    token = response['token']
-    headers = {'Cookie': f'token={token}'}
-
-    for id in bookings_ids:
-        requests.delete(f"{base_url}/booking/{id}", headers=headers)
-        print(f'\n{id} was deleted')
-
-
-@pytest.fixture()
 def create_booking():
     return CreateBooking()
 
@@ -93,3 +35,52 @@ def update_booking_full():
 @pytest.fixture()
 def update_booking_part():
     return UpdateBookingPart()
+
+
+@pytest.fixture()
+def start_end():
+    print('\nStart testing')
+    yield
+    print('\nEnd testing')
+
+
+@pytest.fixture()
+def get_auth_token():
+    return GetAuthToken()
+
+
+@pytest.fixture()
+def create_booking_obj():
+    data = CreateBooking().create_booking()
+    return data
+
+
+@pytest.fixture()
+def auth():
+    token = GetAuthToken().get_auth_token()
+    return token
+
+
+@pytest.fixture()
+def del_booking():
+    bookings_ids = []
+    yield bookings_ids
+
+    token = GetAuthToken().get_auth_token()
+
+    for id in bookings_ids:
+        DeleteBooking().delete_booking(booking_id=id, token=token)
+        print(f'\n{id} was deleted')
+
+
+@pytest.fixture()
+def create_del_booking():
+    data = CreateBooking().create_booking()
+    yield data
+
+    token = GetAuthToken().get_auth_token()
+
+    DeleteBooking().delete_booking(booking_id=data.bookingid,
+                                   token=token)
+    print(f'\n{data.bookingid} was deleted')
+

@@ -22,6 +22,7 @@ class CreateBooking(BaseEndpoint):
         self.booking_dates_checkin = self.response_json['booking']['bookingdates']['checkin']
         self.booking_dates_checkout = self.response_json['booking']['bookingdates']['checkout']
         self.additional_needs = self.response_json['booking']['additionalneeds']
+        return self.data
 
     @allure.step('Check schema is correct')
     def check_response_schema(self):
